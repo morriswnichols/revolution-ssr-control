@@ -1,0 +1,61 @@
+
+/*************************************************** 
+This is to test the functionality of the PID loop with 
+the thermocouple 
+
+ ****************************************************/
+#include <PID_v1.h>
+#include <SPI.h>
+#include "Adafruit_MAX31855.h"
+
+#define PIN_INPUT 0
+#define PIN_OUTPUT 2
+
+
+// Initialize the Thermocouple
+int thermoCLK = 8;
+int thermoCS = 7;
+int thermoDO = 6;
+Adafruit_MAX31855 thermocouple(thermoCLK, thermoCS, thermoDO);
+
+//Define Variables we'll be connecting to
+double Setpoint, Input, Output;
+
+//Specify the links and initial tuning parameters
+double Kp=2, Ki=5, Kd=1;
+PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
+
+
+
+void setup()
+{
+ 
+  //initialize the variables we're linked to
+  Input = analogRead(PIN_INPUT);
+  Input = thermocouple.readFarenheit();
+  Setpoint = 400;
+ 
+  //turn the PID on
+  myPID.SetMode(AUTOMATIC);
+  
+  // initialize serial communications at 9600 bps:
+  Serial.begin(9600);
+
+   Serial.println("MAX31855 test");
+  // wait for MAX chip to stabilize
+  delay(500);
+}
+
+void loop()
+{
+ double Input = thermocouple.readFarenheit();
+  
+  myPID.Compute();
+
+  analogWrite(PIN_OUTPUT, Output);
+  Serial.print("Temp = ");
+  Serial.print(Input);
+  Serial.print("\t Output Value = ");
+  Serial.println(Output);
+  
+}
