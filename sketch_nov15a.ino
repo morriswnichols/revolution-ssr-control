@@ -17,8 +17,8 @@ DeviceAddress tankAddress, headAddress;
 void setup()
 {
   // start serial port
-  Serial.begin(9600);
-  Serial.println("Dallas Temperature IC Control Library Demo");
+  Serial.begin(115200);
+  //Serial.println("Dallas Temperature IC Control Library Demo");
 
   // Start up the library
   sensors.begin();
@@ -28,13 +28,13 @@ void setup()
   if (!sensors.getAddress(tankAddress, 0)) Serial.println("Unable to find address for Device 0");
   if (!sensors.getAddress(headAddress, 1)) Serial.println("Unable to find address for Device 1");
   // show the addresses we found on the bus
-  Serial.print("Tank Address: ");
-  printAddress(tankAddress);
-  Serial.println();
+  //Serial.print("Tank Address: ");
+  //printAddress(tankAddress);
+  //Serial.println();
 
-  Serial.print("Head Address: ");
-  printAddress(headAddress);
-  Serial.println();
+  //Serial.print("Head Address: ");
+  //printAddress(headAddress);
+  //Serial.println();
   
 }
 
@@ -47,6 +47,37 @@ void setup()
        // zero pad the address if necessary
        if (deviceAddress[i] < 16) Serial.print("0");
        Serial.print(deviceAddress[i], HEX);
+      }
+    }
+
+
+
+    // function to print the temperature for a device
+    void printTemperature(DeviceAddress deviceAddress)
+    {
+      float tempC = sensors.getTempC(deviceAddress);
+      //  Serial.print("Temp C: ");
+      //  Serial.print(tempC);
+      //Serial.print(" Temp F: ");
+      Serial.println(DallasTemperature::toFahrenheit(tempC));
+    }
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  delay(1000);
+  // request to the headtemp address on the bus
+    sensors.requestTemperatures();
+    double tankTemp = sensors.getTempC(tankAddress);
+    double headTemp = sensors.getTempC(headAddress);
+    headTemp = headTemp+50;
+    //Serial.print("Head Temp = ");
+    Serial.print(DallasTemperature::toFahrenheit(tankTemp));
+    Serial.print(" , ");
+    Serial.println(DallasTemperature::toFahrenheit(headTemp));
+    delay(500);
+
+
+}
       }
     }
 
